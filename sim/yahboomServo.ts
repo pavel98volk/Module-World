@@ -1,9 +1,15 @@
 namespace pxsim.visuals {
     const SVG_NS = "http://www.w3.org/2000/svg";
 
-    function elt(name: string, props?: any, children?: any[]): SVGElement {
-        const doc = (typeof window !== "undefined") ? window.document : (Function("return this")()).document;
-        const el = doc.createElementNS(SVG_NS, name);
+    function elt(name: string, props?: any, children?: any[]): any {
+        let doc: any;
+        if (typeof document !== "undefined") {
+            doc = document;
+        } else {
+            try { doc = (new (Function as any)("return this")()).document; } catch (e) {}
+        }
+        
+        const el = doc ? doc.createElementNS(SVG_NS, name) : {};
         if (props) {
             for (const key in props) {
                 if (key === "class") el.setAttribute("class", props[key]);
@@ -19,7 +25,7 @@ namespace pxsim.visuals {
         return el;
     }
 
-    export function mkMWServoPartSvg(xy: number[]): { el: SVGElement, x: number, y: number, w: number, h: number } {
+    export function mkMWServoPartSvg(xy: number[]): { el: any, x: number, y: number, w: number, h: number } {
         const x = xy[0];
         const y = xy[1];
         const w = 100;

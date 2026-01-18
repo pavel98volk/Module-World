@@ -10,19 +10,22 @@ namespace pxsim.ModuleWorld_PWM {
 
     // Initialize the simulator listener
     export function init() {
-        const runtime = pxsim.runtime;
-        if (!runtime || !runtime.board) return;
+        if (!pxsim.runtime || !pxsim.runtime.board) {
+            setTimeout(init, 250); /* wait 250ms for runtime/board to initialize */
+            return;
+        }
+        const r = pxsim.runtime;
 
         // Listen for 360 Servo events (P1-P4 -> ServoNum 1-4)
         // IDs: 11001, 11002, 11003, 11004
-        runtime.board.bus.listen(MODULE_WORLD_360SERVO_EVENT_FIRST + 1, MODULE_WORLD_360SERVO_EVENT_FIRST + 4, (id, value) => {
+        r.board.bus.listen(MODULE_WORLD_360SERVO_EVENT_FIRST + 1, MODULE_WORLD_360SERVO_EVENT_FIRST + 4, (id, value) => {
             const servoNum = id - MODULE_WORLD_360SERVO_EVENT_FIRST;
             updateServo(servoNum, value);
         });
 
         // Listen for 270 Servo events
         // IDs: 11006, 11007, 11008, 11009
-        runtime.board.bus.listen(MODULE_WORLD_270SERVO_EVENT_FIRST + 1, MODULE_WORLD_270SERVO_EVENT_FIRST + 4, (id, value) => {
+        r.board.bus.listen(MODULE_WORLD_270SERVO_EVENT_FIRST + 1, MODULE_WORLD_270SERVO_EVENT_FIRST + 4, (id, value) => {
             const servoNum = id - MODULE_WORLD_270SERVO_EVENT_FIRST;
             updateServo(servoNum, value);
         });
@@ -30,17 +33,18 @@ namespace pxsim.ModuleWorld_PWM {
 
     function updateServo(servoNum: number, value: number) {
         let el = servoVisuals[servoNum];
-        
+        /* runtime and board already initialized before adding this listener */
+
         if (!el) {
             // Create visual if it doesn't exist
             // Position servos in a row below the board: x = 20 + (index-1)*110
             const x = 20 + (servoNum - 1) * 110;
             const y = 150; // Adjust Y to place it below the micro:bit
-            
+
             // Use the factory from yahboomServo.ts
             const part = pxsim.visuals.mkMWServoPartSvg([x, y]);
             el = part.el;
-            
+
             // Append to the board view (SVG)
             const boardView = pxsim.runtime.board.view;
             if (boardView) {
@@ -66,10 +70,5 @@ namespace pxsim.ModuleWorld_PWM {
         }
     }
 
-    // Hook into runtime initialization to start listening when the sim starts
-    const oldInit = pxsim.initCurrentRuntime;
-    pxsim.initCurrentRuntime = () => {
-        if (oldInit) oldInit();
-        init();
-    };
+    init();
 }
