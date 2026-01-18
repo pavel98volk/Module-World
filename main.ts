@@ -432,6 +432,11 @@ namespace ModuleWorld_Analog {
 //% color="#ECA40D" weight=22 icon="\uf085"
 namespace ModuleWorld_PWM {
 
+    /* Constants for SIM communication. Please change if number of servo pin configs changes */
+    const MODULE_WORLD_EVENT_ID = 11000
+    const MODULE_WORLD_360SERVO_EVENT_FIRST = MODULE_WORLD_EVENT_ID
+    const MODULE_WORLD_270SERVO_EVENT_FIRST = MODULE_WORLD_360SERVO_EVENT_FIRST + 5
+
     export enum enColor {
         //% blockId="OFF" block="OFF"
         OFF = 0,
@@ -614,6 +619,8 @@ namespace ModuleWorld_PWM {
         else if(ServoNum == 4) { pin = AnalogPin.P10; }
 
         pins.servoSetPulse(pin, Math.map(value, 0, 360, 500, 2500))
+
+        postNumberToSim(MODULE_WORLD_360SERVO_EVENT_FIRST + ServoNum, value)
     }
 
     //% blockId=ModuleWorld_PWM_Servo2 block="Servo(270)|pin %ServoNum|value %value"
@@ -629,7 +636,15 @@ namespace ModuleWorld_PWM {
         else if(ServoNum == 4) { pin = AnalogPin.P10; }
 
         pins.servoSetPulse(pin, Math.map(value, 0, 270, 500, 2500))
+
+        postNumberToSim(MODULE_WORLD_270SERVO_EVENT_FIRST + ServoNum, value)
+    }
+
+    /* Functions that run only in SIM! */
+
+    //% shim=TD_NOOP
+    function postNumberToSim(id: number, value: number) {
+        control.raiseEvent(id, value);
     }
 
 }
-
