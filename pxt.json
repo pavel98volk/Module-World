@@ -1,7 +1,7 @@
 {
     "name": "Module-World",
-    "version": "0.0.1",
-    "description": "Extension for YahBoom YB_Module-World V0.0.1",
+    "version": "0.0.10",
+    "description": "Extension for YahBoom YB_Module-World V0.0.10",
     "license": "MIT",
     "dependencies": {
         "core": "*",
@@ -16,6 +16,10 @@
     ],
     "testFiles": [
         "test.ts"
+    ],
+    "simFiles": [
+      "sim/yahboomServo.ts",
+      "sim/state.ts"
     ],
     "public": false,
     "preferredEditor": "tsprj"
